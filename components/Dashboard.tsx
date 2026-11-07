@@ -163,7 +163,7 @@ export default function Dashboard({ initial, blobReady }: { initial: Content; bl
       <nav className="flex overflow-x-auto bg-white border-b">
         {TABS.map(([k, v]) => <button key={k} onClick={() => setTab(k)} className={`px-4 py-3 whitespace-nowrap ${tab === k ? "border-b-4 border-yellow-500 font-bold" : ""}`}>{v}</button>)}
       </nav>
-      <div className={`${tab === "analytics" ? "max-w-6xl" : "max-w-4xl"} mx-auto p-4`}>
+      <div className={`${tab === "analytics" ? "max-w-7xl" : "max-w-4xl"} mx-auto p-4`}>
         <div className="bg-white rounded-xl shadow p-5">
           {tab === "seo" && (<>
             <F label="عنوان الموقع (Title)"><T v={c.seo.title} on={(s) => up("seo", { title: s })} /></F>
