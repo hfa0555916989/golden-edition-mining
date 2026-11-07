@@ -28,3 +28,22 @@ h1, h2, h3, .display { font-family: var(--heading); }
 @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,.55);} 70% { box-shadow: 0 0 0 16px rgba(37,211,102,0);} 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0);} }
 .wa-pulse { animation: pulse-ring 2.2s infinite; }
 .inp { width:100%; background:#fff; color:#111; border:1px solid #ccc; border-radius:.5rem; padding:.5rem .75rem; }
+/* brand logo */
+.brand-logo { --lh: var(--logo-m); display:inline-flex; align-items:center; gap: calc(var(--lh) * .22); height: var(--lh); }
+@media (min-width: 768px) { .brand-logo { --lh: var(--logo-d); } }
+.brand-emblem { height: 100%; width: auto; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(212,175,55,.25)); }
+.brand-words { display:flex; flex-direction:column; justify-content:center; line-height:1.05; white-space:nowrap; }
+.brand-ar { font-family: var(--heading); font-weight: 700; font-size: calc(var(--lh) * .40); line-height: 1.3; padding-bottom: .22em; margin-bottom: -.2em; }
+.brand-sub { font-family: var(--heading); font-weight: 600; font-size: calc(var(--lh) * .22); margin-top: calc(var(--lh) * .04); }
+.brand-en { font-family: var(--body); font-size: calc(var(--lh) * .105); letter-spacing: .06em; margin-top: calc(var(--lh) * .06); font-weight: 600; }
+@media (max-width: 380px) { .brand-en { display:none; } }
+/* hexagon motif (from the company brochure) */
+.hex { clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+.hex-frame { position: relative; aspect-ratio: 1 / 1.1547; background: linear-gradient(135deg, #f6e27a, var(--primary) 45%, var(--secondary)); padding: 4px; }
+.hex-frame > .hex-in { position:absolute; inset:4px; overflow:hidden; }
+.hex-frame:hover img { transform: scale(1.07); }
+.hex-frame img { transition: transform 1s cubic-bezier(.2,.7,.2,1); }
+.hex-bg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66 0 50V17L28 1l28 16v33zM28 98V66' fill='none' stroke='%23d4af37' stroke-opacity='.09' stroke-width='1.2'/%3E%3C/svg%3E"); background-size: 56px 98px; }
+.nav-drop { position: relative; }
+.nav-drop > .drop { position:absolute; top:100%; right:-1rem; min-width: 15rem; padding:.5rem; opacity:0; visibility:hidden; transform: translateY(6px); transition: .2s; }
+.nav-drop:hover > .drop, .nav-drop:focus-within > .drop { opacity:1; visibility:visible; transform:none; }

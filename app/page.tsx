@@ -1,106 +1,34 @@
-import Image from "next/image";
 import { getContent } from "../lib/store";
-import { intl, siteUrl } from "../lib/url";
-import { VARIANT } from "../lib/site";
-import type { Item } from "../lib/types";
-import Reveal from "../components/Reveal";
+import type { Metadata } from "next";
 import Counter from "../components/Counter";
-import MobileNav from "../components/MobileNav";
-import { WhatsAppIcon, Divider } from "../components/Brand";
-import {
-  Coffee, Users, PartyPopper, Gem, Sparkles, Pickaxe, Building2, Shovel, Truck, Route, MapPin, Award, Clock, ShieldCheck,
-  BadgePercent, Phone, Mail, Quote, Star, CheckCircle2, ArrowLeft, HardHat, Wrench, Globe, AtSign, Camera, Music2, Share2,
-} from "lucide-react";
+import ServiceCards from "../components/ServiceCards";
+import Shell, { Head, Img, HexImg, links } from "../components/Shell";
+import { WhatsAppIcon } from "../components/Brand";
+import { pageMeta } from "../lib/seo";
+import Image from "next/image";
+import { MapPin, Award, Truck, ShieldCheck, Clock, HardHat, Wrench, Phone, Quote, Star, CheckCircle2, ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+const WHY_ICONS = [Truck, HardHat, Award, ShieldCheck, Clock, Wrench];
 
-const SERVICE_ICONS = VARIANT === "golden" ? [Pickaxe, Building2, Shovel, Truck, Route, HardHat, Wrench] : [Coffee, Users, PartyPopper, Gem, Sparkles, Coffee, Users];
-const WHY_ICONS = VARIANT === "golden" ? [Award, Truck, ShieldCheck, Clock, HardHat, Wrench] : [Award, Clock, Gem, BadgePercent, ShieldCheck, Sparkles];
-const SOCIAL_ICONS: Record<string, typeof Globe> = { instagram: Camera, x: AtSign, snapchat: Share2, tiktok: Music2, facebook: Globe };
-
-function Head({ eyebrow, title, light }: { eyebrow?: string; title: string; light?: boolean }) {
-  return (
-    <div className="text-center mb-12 md:mb-16 reveal">
-      {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-      <h2 className={`text-3xl md:text-5xl font-bold mt-3 leading-tight ${light ? "" : "gold-grad"}`}>{title}</h2>
-      <Divider variant={VARIANT} />
-    </div>
-  );
-}
-function Img({ src, alt, className, sizes, priority }: { src: string; alt: string; className?: string; sizes: string; priority?: boolean }) {
-  if (!src) return null;
-  return <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className={className ?? "object-cover"} />;
-}
-function PhotoCards({ items, icons, sizes }: { items: Item[]; icons: typeof SERVICE_ICONS; sizes: string }) {
-  return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((s, i) => {
-        const Icon = icons[i % icons.length];
-        return (
-          <article key={i} className="card cut overflow-hidden group zoom reveal" style={{ transitionDelay: `${(i % 3) * 90}ms` }}>
-            {s.image && <div className="relative aspect-[4/3] overflow-hidden"><Img src={s.image} alt={s.title} sizes={sizes} /><div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" /></div>}
-            <div className="p-6 relative">
-              <div className={`icon-chip ${s.image ? "-mt-12 relative shadow-xl" : "mb-4"}`} style={s.image ? { background: "var(--surface)" } : undefined}><Icon size={24} strokeWidth={1.6} /></div>
-              <h3 className="text-xl md:text-2xl font-bold mt-4 mb-2">{s.title}</h3>
-              <p className="opacity-75 leading-8">{s.desc}</p>
-            </div>
-          </article>
-        );
-      })}
-    </div>
-  );
+export async function generateMetadata(): Promise<Metadata> {
+  const c = await getContent();
+  return { ...pageMeta(c, { path: "/", title: c.seo.title, desc: c.seo.description, image: c.seo.ogImage }), keywords: c.seo.keywords.split(/[,،]/).map((s) => s.trim()).filter(Boolean) };
 }
 
 export default async function Home() {
   const c = await getContent();
-  const t = c.titles, S = c.sections, G = VARIANT === "golden";
-  const wa = `https://wa.me/${intl(c.contact.whatsapp || c.contact.phone)}`;
-  const tel = `tel:+${intl(c.contact.phone)}`;
+  const t = c.titles, S = c.sections;
+  const { wa, tel } = links(c);
   const on = (k: string) => S[k] !== false;
-  const nav: [string, string][] = ([["about", t.about], ["services", t.services], ["cities", t.cities], ["projects", t.projects], ["gallery", t.gallery], ["videos", t.videos], ["contact", t.contact]] as [string, string][])
-    .filter(([k]) => on(k) && (k !== "cities" || c.cities.length) && (k !== "projects" || c.projects.length) && (k !== "gallery" || c.gallery.length) && (k !== "videos" || c.videos.length));
-  const abs = (u: string) => (u && u.startsWith("/") ? siteUrl() + u : u);
-  const jsonLd = {
-    "@context": "https://schema.org", "@type": "LocalBusiness", name: c.hero.badge || c.seo.title, description: c.seo.description,
-    url: siteUrl(), telephone: "+" + intl(c.contact.phone), image: abs(c.seo.ogImage || c.identity.logo || c.hero.image) || undefined,
-    address: { "@type": "PostalAddress", addressCountry: "SA", addressLocality: c.contact.address },
-    areaServed: c.cities.flatMap((x) => [x.title, ...(x.desc.includes("–") ? x.desc.split("–").map((s) => s.trim()) : [])]).filter(Boolean).map((name) => ({ "@type": "City", name })),
-    sameAs: Object.values(c.social).filter(Boolean),
-  };
-  const socials = Object.entries(c.social).filter(([, v]) => v);
   const points = (c.about.points || "").split("\n").map((s) => s.trim()).filter(Boolean);
-
   return (
-    <div className={G ? "v-golden" : "v-alrowad"}>
-      <Reveal />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      {/* Header */}
-      <header className="fixed top-0 inset-x-0 z-40 backdrop-blur-xl border-b" style={{ background: "color-mix(in srgb, var(--bg) 78%, transparent)", borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)" }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-[72px] md:h-[84px] flex items-center justify-between gap-4">
-          <a href="#" className="flex items-center gap-3 min-w-0">
-            {c.identity.logo ? <img src={c.identity.logo} alt={c.hero.badge} className="logo" /> : (
-              <span className="flex items-center gap-2.5">
-                <span className="icon-chip !w-10 !h-10 md:!w-12 md:!h-12">{G ? <Pickaxe size={22} /> : <Coffee size={22} />}</span>
-                <span className="display font-bold text-base md:text-xl leading-tight gold-grad">{c.hero.badge}</span>
-              </span>
-            )}
-          </a>
-          <nav className="hidden lg:flex items-center gap-7 text-[15px] font-medium">
-            {nav.map(([k, v]) => <a key={k} href={`#${k}`} className="opacity-85 hover:opacity-100 hover:text-[var(--primary)] transition">{v}</a>)}
-          </nav>
-          <div className="flex items-center gap-2">
-            <a href={tel} className="btn !py-2.5 !px-5 text-sm hidden md:inline-flex whitespace-nowrap"><Phone size={16} />{t.callNow || "اتصل الآن"}</a>
-            <MobileNav links={nav} tel={tel} callLabel={t.callNow || "اتصل الآن"} />
-          </div>
-        </div>
-      </header>
-
+    <Shell c={c}>
       {/* Hero */}
       <section className="relative min-h-[100svh] flex items-end md:items-center overflow-hidden">
         <Img src={c.hero.image} alt={c.hero.title} sizes="100vw" priority />
-        <div className="absolute inset-0" style={{ background: G ? "linear-gradient(100deg, rgba(10,11,13,.35) 0%, rgba(10,11,13,.75) 55%, rgba(10,11,13,.95) 100%)" : "linear-gradient(to left, rgba(14,9,7,.95) 0%, rgba(14,9,7,.7) 45%, rgba(14,9,7,.3) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(100deg, rgba(10,11,13,.35) 0%, rgba(10,11,13,.75) 55%, rgba(10,11,13,.95) 100%)" }} />
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent" />
         <div className="relative max-w-7xl mx-auto w-full px-4 md:px-6 pt-32 pb-20 md:py-0">
           <div className="max-w-2xl reveal">
@@ -138,14 +66,11 @@ export default async function Home() {
           {c.about.image && <div className="absolute inset-0 opacity-[.08]"><Img src={c.about.image} alt="" sizes="100vw" /></div>}
           <div className="absolute inset-0 pattern opacity-60" />
           <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="relative reveal">
-              <div className="relative aspect-[4/5] md:aspect-[5/5] overflow-hidden card cut">
-                <Img src={c.about.image} alt={c.about.title || t.about} sizes="(min-width:1024px) 45vw, 100vw" />
-              </div>
-              <div className="absolute -bottom-6 -left-2 md:-left-8 card cut px-6 py-5 shadow-2xl" style={{ background: "var(--primary)", color: "#111" }}>
-                <div className="display text-3xl font-bold">{c.stats[1]?.title || ""}</div>
-                <div className="text-sm font-semibold">{c.stats[1]?.desc || ""}</div>
-              </div>
+            <div className="relative reveal grid grid-cols-2 gap-4 max-w-lg mx-auto w-full">
+              <HexImg src={c.about.image} alt={c.about.title || t.about} sizes="(min-width:1024px) 22vw, 45vw" className="col-span-1 mt-16" />
+              <HexImg src={c.services[1]?.image || c.hero.image} alt={c.services[1]?.title || ""} sizes="(min-width:1024px) 22vw, 45vw" />
+              <HexImg src={c.services[2]?.image || c.hero.image} alt={c.services[2]?.title || ""} sizes="(min-width:1024px) 22vw, 45vw" className="-mt-16" />
+              <HexImg src={c.services[3]?.image || c.hero.image} alt={c.services[3]?.title || ""} sizes="(min-width:1024px) 22vw, 45vw" />
             </div>
             <div className="reveal">
               <span className="eyebrow">{t.about}</span>
@@ -156,7 +81,7 @@ export default async function Home() {
                   {points.map((p, i) => <li key={i} className="flex items-start gap-3"><CheckCircle2 className="gold shrink-0 mt-1" size={20} /><span>{p}</span></li>)}
                 </ul>
               )}
-              <a href={wa} target="_blank" rel="noopener" className="btn">{c.hero.cta}<ArrowLeft size={18} /></a>
+              <div className="flex flex-wrap gap-3"><a href="/about" className="btn">اقرأ المزيد<ArrowLeft size={18} /></a><a href={wa} target="_blank" rel="noopener" className="btn-ghost"><WhatsAppIcon size={18} color="var(--primary)" />{c.hero.cta}</a></div>
             </div>
           </div>
         </section>
@@ -164,8 +89,8 @@ export default async function Home() {
 
       {/* Services */}
       {on("services") && c.services.length > 0 && (
-        <section id="services" className="py-24 md:py-32 px-4" style={{ background: "var(--surface)" }}>
-          <div className="max-w-7xl mx-auto"><Head eyebrow={c.hero.badge} title={t.services} /><PhotoCards items={c.services} icons={SERVICE_ICONS} sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" /></div>
+        <section id="services" className="py-24 md:py-32 px-4 hex-bg" style={{ background: "var(--surface)" }}>
+          <div className="max-w-7xl mx-auto"><Head eyebrow={c.hero.badge} title={t.services} /><ServiceCards items={c.services} /></div>
         </section>
       )}
 
@@ -298,52 +223,14 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Contact */}
-      <section id="contact" className="py-24 md:py-28 px-4" style={{ background: "var(--surface)" }}>
-        <div className="max-w-6xl mx-auto">
-          <Head title={t.contact} />
-          <div className="grid gap-6 md:grid-cols-3">
-            <a href={tel} className="card cut p-8 text-center reveal hover:-translate-y-1 transition"><div className="icon-chip mx-auto mb-4"><Phone size={24} /></div><div className="font-bold text-lg mb-1">اتصال مباشر</div><div dir="ltr" className="gold text-xl font-bold">{c.contact.phone}</div></a>
-            <a href={wa} target="_blank" rel="noopener" className="card cut p-8 text-center reveal hover:-translate-y-1 transition"><div className="mx-auto mb-4 w-[3.25rem] h-[3.25rem] rounded-full grid place-items-center" style={{ background: "#25D366" }}><WhatsAppIcon size={26} /></div><div className="font-bold text-lg mb-1">واتساب</div><div dir="ltr" className="gold text-xl font-bold">{c.contact.whatsapp || c.contact.phone}</div></a>
-            <div className="card cut p-8 text-center reveal"><div className="icon-chip mx-auto mb-4"><MapPin size={24} /></div><div className="font-bold text-lg mb-1">مناطق الخدمة</div><div className="opacity-85">{c.contact.address}</div>{c.contact.workingHours && <div className="text-sm opacity-70 mt-2 flex items-center justify-center gap-1"><Clock size={14} />{c.contact.workingHours}</div>}</div>
-          </div>
+      <section id="contact" className="py-24 md:py-28 px-4 text-center" style={{ background: "var(--surface)" }}>
+        <Head title={t.contact} />
+        <div className="flex flex-wrap justify-center gap-3 reveal">
+          <a href={tel} className="btn"><Phone size={18} /><span dir="ltr">{c.contact.phone}</span></a>
+          <a href={wa} target="_blank" rel="noopener" className="btn-ghost"><WhatsAppIcon size={18} color="var(--primary)" />واتساب</a>
+          <a href="/contact" className="btn-ghost">صفحة التواصل<ArrowLeft size={18} /></a>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="pt-16 pb-28 px-4 border-t" style={{ borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)" }}>
-        <div className="max-w-7xl mx-auto grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-2">
-            {c.identity.logo ? <img src={c.identity.logo} alt={c.hero.badge} className="logo mb-4" /> : <div className="display text-2xl font-bold gold-grad mb-4">{c.hero.badge}</div>}
-            <p className="opacity-70 leading-8 max-w-md">{c.seo.description}</p>
-            {socials.length > 0 && <div className="flex gap-3 mt-5">{socials.map(([k, v]) => { const I = SOCIAL_ICONS[k] || Globe; return <a key={k} href={v} target="_blank" rel="noopener" aria-label={k} className="icon-chip !w-10 !h-10"><I size={18} /></a>; })}</div>}
-          </div>
-          <div>
-            <h4 className="display font-bold text-lg mb-4 gold">روابط سريعة</h4>
-            <ul className="space-y-2 opacity-80">{nav.map(([k, v]) => <li key={k}><a href={`#${k}`} className="hover:text-[var(--primary)]">{v}</a></li>)}</ul>
-          </div>
-          <div>
-            <h4 className="display font-bold text-lg mb-4 gold">{t.contact}</h4>
-            <ul className="space-y-3 opacity-85">
-              <li><a href={tel} className="flex items-center gap-2"><Phone size={16} className="gold" /><span dir="ltr">{c.contact.phone}</span></a></li>
-              <li><a href={wa} className="flex items-center gap-2"><WhatsAppIcon size={16} color="var(--primary)" /><span dir="ltr">{c.contact.whatsapp || c.contact.phone}</span></a></li>
-              {c.contact.email && <li><a href={`mailto:${c.contact.email}`} className="flex items-center gap-2"><Mail size={16} className="gold" />{c.contact.email}</a></li>}
-              <li className="flex items-start gap-2"><MapPin size={16} className="gold mt-1 shrink-0" />{c.contact.address}</li>
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-6 border-t text-center text-sm opacity-60" style={{ borderColor: "color-mix(in srgb, var(--primary) 12%, transparent)" }}>{c.footer.text}</div>
-      </footer>
-
-      {/* Floating buttons */}
-      <div className="fixed bottom-5 left-5 z-50 flex flex-col gap-3">
-        <a href={wa} aria-label="تواصل عبر واتساب" target="_blank" rel="noopener" className="wa-pulse w-[60px] h-[60px] rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-110 transition" style={{ background: "#25D366" }}>
-          <WhatsAppIcon size={32} />
-        </a>
-        <a href={tel} aria-label="اتصال" className="w-[60px] h-[60px] rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-110 transition border-2" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--primary) 80%, #fff), var(--primary))", borderColor: "rgba(255,255,255,.25)" }}>
-          <Phone size={26} color="#111" fill="#111" strokeWidth={1.5} />
-        </a>
-      </div>
-    </div>
+    </Shell>
   );
 }

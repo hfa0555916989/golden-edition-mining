@@ -1,5 +1,5 @@
 import { list, put, del } from "@vercel/blob";
-import { defaults } from "./defaults";
+import { defaults, CONTENT_VERSION } from "./defaults";
 import type { Content } from "./types";
 
 const PREFIX = "content/settings";
@@ -28,7 +28,19 @@ export async function getContent(): Promise<Content> {
     blobs.sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt));
     const res = await fetch(blobs[0].url, { cache: "no-store" });
     if (!res.ok) return defaults;
-    return merge(defaults, await res.json());
+    const stored = (await res.json()) as Record<string, unknown>;
+    // v3: services/stats/texts now follow the official brochure; drop older generated copies
+    if (!stored || Number(stored.version || 0) < CONTENT_VERSION) {
+      for (const k of ["version", "services", "stats", "seo", "hero", "about", "projects", "why", "titles", "cta", "pages"]) delete stored[k];
+      const gal = stored.gallery as { url?: string }[] | undefined;
+      if (Array.isArray(gal) && gal.every((x) => String(x?.url || "").startsWith("/images/"))) delete stored.gallery;
+      const id = stored.identity as Record<string, unknown> | undefined;
+      if (id && id.logoSizeMobile === 44) delete id.logoSizeMobile;
+    }
+    const c = merge(defaults, stored);
+    const blank = { slug: "", title: "", desc: "", image: "", seoTitle: "", seoDesc: "", ogImage: "", points: "", images: [] as string[], highlight: "" };
+    c.services = (c.services as Partial<Content["services"][number]>[]).map((s, i) => ({ ...blank, ...s, slug: s.slug || `service-${i + 1}` }));
+    return c;
   } catch (e) {
     console.error("getContent failed", e);
     return defaults;
@@ -38,11 +50,31 @@ export async function getContent(): Promise<Content> {
 export async function saveContent(c: Content) {
   if (!hasBlob()) throw new Error("BLOB_READ_WRITE_TOKEN is not configured");
   // unique file per save => never served stale from CDN; old versions cleaned up
-  const saved = await put(`${PREFIX}.json`, JSON.stringify(c), {
+  const saved = await put(`${PREFIX}.json`, JSON.stringify({ ...c, version: CONTENT_VERSION }), {
     access: "public", addRandomSuffix: true, contentType: "application/json",
   });
   const { blobs } = await list({ prefix: PREFIX });
   const old = blobs.filter((b) => b.url !== saved.url).sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt)).slice(2);
   if (old.length) await del(old.map((b) => b.url));
   return saved.url;
+}
+
+/* ---------- private admin settings (password hash) ---------- */
+const AUTH_PREFIX = "private/auth";
+export type AuthSettings = { passwordHash?: string; updatedAt?: string };
+export async function getAuthSettings(): Promise<AuthSettings> {
+  if (!hasBlob()) return {};
+  const { blobs } = await list({ prefix: AUTH_PREFIX });
+  if (!blobs.length) return {};
+  blobs.sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt));
+  const res = await fetch(blobs[0].url, { cache: "no-store" });
+  if (!res.ok) throw new Error("auth settings read failed");
+  return (await res.json()) as AuthSettings;
+}
+export async function saveAuthSettings(a: AuthSettings) {
+  if (!hasBlob()) throw new Error("BLOB_READ_WRITE_TOKEN is not configured");
+  const saved = await put(`${AUTH_PREFIX}.json`, JSON.stringify(a), { access: "public", addRandomSuffix: true, contentType: "application/json" });
+  const { blobs } = await list({ prefix: AUTH_PREFIX });
+  const old = blobs.filter((b) => b.url !== saved.url);
+  if (old.length) await del(old.map((b) => b.url));
 }
