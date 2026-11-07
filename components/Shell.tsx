@@ -1,12 +1,13 @@
 import Image from "next/image";
 import type { Content } from "../lib/types";
+import { byCategory } from "../lib/services";
 import { intl } from "../lib/url";
 import { orgLd, ld } from "../lib/seo";
 import Reveal from "./Reveal";
 import MobileNav from "./MobileNav";
 import Logo from "./Logo";
 import { WhatsAppIcon, Divider } from "./Brand";
-import { Phone, Mail, MapPin, Globe, AtSign, Camera, Music2, Share2, ChevronDown, ChevronLeft } from "lucide-react";
+import { Phone, Mail, MapPin, Globe, AtSign, Camera, Music2, Share2, ChevronLeft } from "lucide-react";
 
 const SOCIAL_ICONS: Record<string, typeof Globe> = { instagram: Camera, x: AtSign, snapchat: Share2, tiktok: Music2, facebook: Globe };
 export const links = (c: Content) => {
@@ -19,7 +20,7 @@ export function Head({ eyebrow, title, light }: { eyebrow?: string; title: strin
   return (
     <div className="text-center mb-12 md:mb-16 reveal">
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-      <h2 className={`text-3xl md:text-5xl font-bold mt-3 leading-tight ${light ? "" : "gold-grad"}`}>{title}</h2>
+      <h2 className={`fluid-h2 font-bold mt-3 ${light ? "" : "gold-grad"}`}>{title}</h2>
       <Divider variant="golden" />
     </div>
   );
@@ -54,14 +55,14 @@ export function Crumbs({ items }: { items: [string, string][] }) {
 
 export function PageHero({ title, subtitle, image, crumbs }: { title: string; subtitle?: string; image: string; crumbs: [string, string][] }) {
   return (
-    <section className="relative pt-36 md:pt-44 pb-20 md:pb-28 px-4 overflow-hidden">
+    <section className="relative pt-28 md:pt-40 pb-16 md:pb-24 px-4 overflow-hidden">
       <Img src={image} alt={title} sizes="100vw" priority />
       <div className="absolute inset-0" style={{ background: "linear-gradient(100deg, rgba(10,11,13,.55) 0%, rgba(10,11,13,.82) 55%, rgba(10,11,13,.96) 100%)" }} />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent" />
       <div className="relative max-w-7xl mx-auto">
         <Crumbs items={crumbs} />
-        <h1 className="text-4xl md:text-6xl font-bold leading-tight mt-5 mb-5 max-w-3xl">{title}</h1>
-        {subtitle && <p className="text-lg md:text-xl opacity-90 leading-9 max-w-2xl">{subtitle}</p>}
+        <h1 className="fluid-h1 font-bold mt-4 mb-4 max-w-3xl">{title}</h1>
+        {subtitle && <p className="fluid-lead opacity-90 max-w-2xl">{subtitle}</p>}
       </div>
     </section>
   );
@@ -71,27 +72,28 @@ export default function Shell({ c, children }: { c: Content; children: React.Rea
   const t = c.titles;
   const { wa, tel } = links(c);
   const socials = Object.entries(c.social).filter(([, v]) => v);
-  const nav: [string, string][] = [["/", "الرئيسية"], ["/about", t.about || "من نحن"], ["/services", t.services || "خدماتنا"], ["/#projects", t.projects], ["/#gallery", t.gallery], ["/contact", t.contact || "تواصل معنا"]];
-  const mobileLinks: [string, string][] = [["/", "الرئيسية"], ["/about", t.about], ...c.services.map((s) => [`/services/${s.slug}`, s.title] as [string, string]), ["/contact", t.contact]];
+  const nav: [string, string][] = [
+    ["/", "الرئيسية"],
+    ["/#mining", t.mining || "التعدين"],
+    ["/#contracting", t.contracting || "المقاولات"],
+    ["/about", t.about || "من نحن"],
+    ["/#projects", t.projects || "مجالات أعمالنا"],
+    ["/#gallery", t.gallery || "المعرض"],
+    ["/contact", t.contact || "تواصل معنا"],
+  ];
+  const mobileLinks = nav;
   return (
     <div className="v-golden">
       <Reveal />
       <script type="application/ld+json" dangerouslySetInnerHTML={ld(orgLd(c))} />
-      <header className="fixed top-0 inset-x-0 z-40 backdrop-blur-xl border-b" style={{ background: "color-mix(in srgb, var(--bg) 80%, transparent)", borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)" }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-[76px] md:h-[92px] flex items-center justify-between gap-4">
-          <a href="/" className="flex items-center min-w-0" aria-label={c.hero.badge}><BrandMark c={c} /></a>
-          <nav className="hidden lg:flex items-center gap-7 text-[15px] font-medium" aria-label="القائمة الرئيسية">
-            {nav.map(([h, v]) => h === "/services" ? (
-              <div key={h} className="nav-drop">
-                <a href={h} className="opacity-85 hover:opacity-100 hover:text-[var(--primary)] transition inline-flex items-center gap-1 py-6">{v}<ChevronDown size={14} /></a>
-                <div className="drop card shadow-2xl">
-                  {c.services.map((s) => <a key={s.slug} href={`/services/${s.slug}`} className="block px-4 py-2.5 rounded hover:bg-white/5 hover:text-[var(--primary)]">{s.title}</a>)}
-                </div>
-              </div>
-            ) : <a key={h} href={h} className="opacity-85 hover:opacity-100 hover:text-[var(--primary)] transition">{v}</a>)}
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b" style={{ background: "color-mix(in srgb, var(--bg) 80%, transparent)", borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)", height: "var(--header-h)" }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-3">
+          <a href="/" className="flex items-center min-w-0 max-w-[68%] sm:max-w-[52%] xl:max-w-[240px] 2xl:max-w-[320px]" aria-label={c.hero.badge}><BrandMark c={c} /></a>
+          <nav className="hidden xl:flex items-center gap-4 2xl:gap-6 text-sm 2xl:text-[15px] font-medium" aria-label="القائمة الرئيسية">
+            {nav.map(([h, v]) => <a key={h} href={h} className="opacity-85 hover:opacity-100 hover:text-[var(--primary)] transition whitespace-nowrap py-2">{v}</a>)}
           </nav>
-          <div className="flex items-center gap-2">
-            <a href={tel} className="btn !py-2.5 !px-5 text-sm hidden md:inline-flex whitespace-nowrap"><Phone size={16} />{t.callNow || "اتصل الآن"}</a>
+          <div className="flex items-center gap-2 shrink-0">
+            <a href={tel} className="btn !py-2 !px-4 text-sm !hidden md:!inline-flex whitespace-nowrap"><Phone size={16} />{t.callNow || "اتصل الآن"}</a>
             <MobileNav links={mobileLinks} tel={tel} callLabel={t.callNow || "اتصل الآن"} />
           </div>
         </div>
@@ -99,16 +101,18 @@ export default function Shell({ c, children }: { c: Content; children: React.Rea
 
       <main>{children}</main>
 
-      <footer className="pt-16 pb-28 px-4 border-t hex-bg" style={{ borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)" }}>
-        <div className="max-w-7xl mx-auto grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <div className="mb-5"><BrandMark c={c} /></div>
+      <footer className="pt-14 pb-32 md:pb-28 px-4 border-t hex-bg" style={{ borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)" }}>
+        <div className="max-w-7xl mx-auto grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+          <div className="md:col-span-2 xl:col-span-2">
+            <div className="mb-5 max-w-xs"><BrandMark c={c} /></div>
             <p className="opacity-70 leading-8 max-w-md">{c.seo.description}</p>
-            {socials.length > 0 && <div className="flex gap-3 mt-5">{socials.map(([k, v]) => { const I = SOCIAL_ICONS[k] || Globe; return <a key={k} href={v} target="_blank" rel="noopener" aria-label={k} className="icon-chip !w-10 !h-10"><I size={18} /></a>; })}</div>}
+            {socials.length > 0 && <div className="flex flex-wrap gap-3 mt-5">{socials.map(([k, v]) => { const I = SOCIAL_ICONS[k] || Globe; return <a key={k} href={v} target="_blank" rel="noopener" aria-label={k} className="icon-chip !w-10 !h-10"><I size={18} /></a>; })}</div>}
           </div>
           <div>
-            <h2 className="display font-bold text-lg mb-4 gold">{t.services}</h2>
-            <ul className="space-y-2 opacity-80">{c.services.map((s) => <li key={s.slug}><a href={`/services/${s.slug}`} className="hover:text-[var(--primary)]">{s.title}</a></li>)}</ul>
+            <h2 className="display font-bold text-lg mb-3 gold"><a href="/#mining" className="hover:opacity-80">{t.mining || "التعدين"}</a></h2>
+            <ul className="space-y-2 opacity-80 mb-6">{byCategory(c.services, "mining").map((s) => <li key={s.slug}><a href={`/services/${s.slug}`} className="hover:text-[var(--primary)]">{s.title}</a></li>)}</ul>
+            <h2 className="display font-bold text-lg mb-3 gold"><a href="/#contracting" className="hover:opacity-80">{t.contracting || "المقاولات"}</a></h2>
+            <ul className="space-y-2 opacity-80">{byCategory(c.services, "contracting").map((s) => <li key={s.slug}><a href={`/services/${s.slug}`} className="hover:text-[var(--primary)]">{s.title}</a></li>)}</ul>
           </div>
           <div>
             <h2 className="display font-bold text-lg mb-4 gold">{t.contact}</h2>
@@ -124,12 +128,12 @@ export default function Shell({ c, children }: { c: Content; children: React.Rea
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t text-center text-sm opacity-60" style={{ borderColor: "color-mix(in srgb, var(--primary) 12%, transparent)" }}>{c.footer.text}</div>
       </footer>
 
-      <div className="fixed bottom-5 left-5 z-50 flex flex-col gap-3">
-        <a href={wa} aria-label="تواصل عبر واتساب" target="_blank" rel="noopener" className="wa-pulse w-[60px] h-[60px] rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-110 transition" style={{ background: "#25D366" }}>
-          <WhatsAppIcon size={32} />
+      <div className="fab-stack">
+        <a href={wa} aria-label="تواصل عبر واتساب" target="_blank" rel="noopener" className="wa-pulse rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-105 transition" style={{ background: "#25D366" }}>
+          <WhatsAppIcon size={28} />
         </a>
-        <a href={tel} aria-label="اتصال" className="w-[60px] h-[60px] rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-110 transition border-2" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--primary) 80%, #fff), var(--primary))", borderColor: "rgba(255,255,255,.25)" }}>
-          <Phone size={26} color="#111" fill="#111" strokeWidth={1.5} />
+        <a href={tel} aria-label="اتصال" className="rounded-full grid place-items-center shadow-[0_10px_25px_rgba(0,0,0,.35)] hover:scale-105 transition border-2" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--primary) 80%, #fff), var(--primary))", borderColor: "rgba(255,255,255,.25)" }}>
+          <Phone size={22} color="#111" fill="#111" strokeWidth={1.5} />
         </a>
       </div>
     </div>

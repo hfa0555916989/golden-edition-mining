@@ -1,8 +1,9 @@
 export type Item = { title: string; desc: string; image?: string };
 export type PageSeo = { seoTitle: string; seoDesc: string; ogImage: string };
-export type Service = Item & PageSeo & { slug: string; points: string; images: string[]; highlight: string };
+export type ServiceCategory = "mining" | "contracting";
+export type Service = Item & PageSeo & { slug: string; points: string; images: string[]; highlight: string; category: ServiceCategory };
 export type Media = { url: string; caption: string; type?: string };
-export type FontKey = "tajawal" | "cairo" | "almarai" | "ibmplex" | "readex" | "elmessiri";
+export type FontKey = "alexandria" | "readex" | "tajawal" | "cairo" | "almarai" | "ibmplex" | "elmessiri";
 export type Content = {
   version: number;
   seo: { title: string; description: string; keywords: string; ogImage: string };

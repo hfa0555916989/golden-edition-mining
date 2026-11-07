@@ -61,8 +61,14 @@ function ServiceList({ items, set }: { items: Service[]; set: (m: Service[]) => 
     <div className="space-y-4">
       {items.map((it, i) => (
         <details key={i} className="border rounded-lg p-3 bg-gray-50" open={i === 0}>
-          <summary className="font-bold cursor-pointer">{it.title} <span className="text-xs text-gray-500" dir="ltr">/services/{it.slug}</span></summary>
+          <summary className="font-bold cursor-pointer flex flex-wrap items-center gap-2">{it.title} <span className="text-xs font-semibold px-2 py-0.5 rounded bg-yellow-100 text-yellow-900">{it.category === "mining" ? "التعدين" : "المقاولات"}</span> <span className="text-xs text-gray-500" dir="ltr">/services/{it.slug}</span></summary>
           <div className="mt-3">
+            <F label="القسم في الصفحة الرئيسية">
+              <select className="inp" value={it.category === "mining" ? "mining" : "contracting"} onChange={(e) => ch(i, { category: e.target.value === "mining" ? "mining" : "contracting" })}>
+                <option value="mining">التعدين</option>
+                <option value="contracting">المقاولات</option>
+              </select>
+            </F>
             <F label="اسم الخدمة"><T v={it.title} on={(s) => ch(i, { title: s })} /></F>
             <F label="رابط الصفحة (بالإنجليزي بدون مسافات)"><input dir="ltr" className="inp" value={it.slug} onChange={(e) => ch(i, { slug: slugify(e.target.value) })} /></F>
             <F label="وصف مختصر"><T area v={it.desc} on={(s) => ch(i, { desc: s })} /></F>
@@ -79,7 +85,7 @@ function ServiceList({ items, set }: { items: Service[]; set: (m: Service[]) => 
           </div>
         </details>
       ))}
-      <button type="button" className="bg-green-600 text-white rounded px-4 py-2" onClick={() => set([...items, { title: "خدمة جديدة", slug: "new-service-" + (items.length + 1), desc: "", points: "", images: [], highlight: "", image: "", seoTitle: "", seoDesc: "", ogImage: "" }])}>+ إضافة خدمة</button>
+      <button type="button" className="bg-green-600 text-white rounded px-4 py-2" onClick={() => set([...items, { title: "خدمة جديدة", slug: "new-service-" + (items.length + 1), desc: "", points: "", images: [], highlight: "", image: "", seoTitle: "", seoDesc: "", ogImage: "", category: "contracting" }])}>+ إضافة خدمة</button>
     </div>
   );
 }
@@ -136,7 +142,7 @@ function ItemList({ items, set, withImage, folder }: { items: Item[]; set: (m: I
   );
 }
 
-const TITLE_LABELS: Record<string, string> = { about: "من نحن", services: "الخدمات", cities: "المدن", projects: "المشاريع", why: "لماذا نحن", stats: "الأرقام", testimonials: "آراء العملاء", gallery: "معرض الصور", videos: "الفيديوهات", contact: "تواصل معنا", callNow: "زر الاتصال في الأعلى" };
+const TITLE_LABELS: Record<string, string> = { about: "من نحن", services: "الخدمات", cities: "المدن", projects: "المشاريع", why: "لماذا نحن", stats: "الأرقام", testimonials: "آراء العملاء", gallery: "معرض الصور", videos: "الفيديوهات", contact: "تواصل معنا", callNow: "زر الاتصال في الأعلى", mining: "عنوان قسم التعدين", contracting: "عنوان قسم المقاولات", miningIntro: "مقدمة قسم التعدين", contractingIntro: "مقدمة قسم المقاولات" };
 
 export default function Dashboard({ initial, blobReady }: { initial: Content; blobReady: boolean }) {
   const [c, setC] = useState<Content>(initial);
@@ -232,7 +238,7 @@ export default function Dashboard({ initial, blobReady }: { initial: Content; bl
           </>)}
           {tab === "analytics" && <Analytics />}
           {tab === "password" && <PasswordForm />}
-          {tab === "services" && (<><p className="text-sm text-gray-600 mb-3">كل خدمة لها صفحة خاصة تظهر في قوقل. لا تنسَ الضغط على «حفظ التغييرات».</p><ServiceList items={c.services} set={(m) => up("services", m)} /></>)}
+          {tab === "services" && (<><p className="text-sm text-gray-600 mb-3">كل خدمة تتبع قسم «التعدين» أو «المقاولات» وتظهر في قسمها على الصفحة الرئيسية، ولها صفحة خاصة تظهر في قوقل. لا تنسَ الضغط على «حفظ التغييرات».</p><ServiceList items={c.services} set={(m) => up("services", m)} /></>)}
           {tab === "lists" && (<>
             <h3 className="font-bold mb-3">المدن / مناطق الخدمة</h3><ItemList folder="cities" items={c.cities} set={(m) => up("cities", m)} />
             <h3 className="font-bold mt-8 mb-3">المشاريع</h3><ItemList folder="projects" withImage items={c.projects} set={(m) => up("projects", m)} />

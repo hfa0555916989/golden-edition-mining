@@ -4,7 +4,7 @@ import { getContent } from "../lib/store";
 import { siteUrl } from "../lib/url";
 
 import Tracker from "../components/Tracker";
-import { fontVar, fontsHref } from "../lib/fonts";
+import { alexandria, fontVar, readex } from "../lib/fonts";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -37,15 +37,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const style = {
     "--primary": i.primary, "--secondary": i.secondary, "--bg": i.background, "--surface": i.surface, "--text": i.text,
     "--logo-d": `${i.logoSizeDesktop}px`, "--logo-m": `${i.logoSizeMobile}px`,
-    "--body": fontVar(i.font), "--heading": fontVar(i.headingFont || i.font),
+    "--body": fontVar(i.font, "readex"), "--heading": fontVar(i.headingFont || "alexandria", "alexandria"),
   } as React.CSSProperties;
   return (
-    <html lang="ar" dir="rtl">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href={fontsHref(i.font, i.headingFont || i.font)} />
-      </head>
+    <html lang="ar" dir="rtl" className={`${alexandria.variable} ${readex.variable}`}>
       <body style={style}>{children}<Tracker /></body>
     </html>
   );

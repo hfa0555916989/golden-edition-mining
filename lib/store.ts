@@ -1,6 +1,7 @@
 import { list, put, del } from "@vercel/blob";
 import { defaults, CONTENT_VERSION } from "./defaults";
-import type { Content } from "./types";
+import { normalizeServices } from "./services";
+import type { Content, FontKey } from "./types";
 
 const PREFIX = "content/settings";
 
@@ -55,8 +56,13 @@ export async function getContent(): Promise<Content> {
     const c = merge(defaults, stored);
     if (LEGACY_LOGO_PATHS.has(publicPath(c.identity.logo))) c.identity.logo = "";
     if (LEGACY_FAVICON_PATHS.has(publicPath(c.identity.favicon))) c.identity.favicon = "";
-    const blank = { slug: "", title: "", desc: "", image: "", seoTitle: "", seoDesc: "", ogImage: "", points: "", images: [] as string[], highlight: "" };
-    c.services = (c.services as Partial<Content["services"][number]>[]).map((s, i) => ({ ...blank, ...s, slug: s.slug || `service-${i + 1}` }));
+    const body = c.identity.font;
+    const head = c.identity.headingFont;
+    const loaded = new Set<FontKey>(["alexandria", "readex"]);
+    if (!loaded.has(body)) c.identity.font = "readex";
+    if (!loaded.has(head) || (body === "ibmplex" && head === "readex")) c.identity.headingFont = "alexandria";
+    const raw = (Array.isArray(stored.services) ? stored.services : c.services) as Partial<Content["services"][number]>[];
+    c.services = normalizeServices(raw);
     return c;
   } catch (e) {
     console.error("getContent failed", e);
