@@ -52,6 +52,14 @@ export async function maybeFlush(force = false) {
   return flushing;
 }
 
+/** Called via after(): flush now, or — if throttled — wait out the window and flush, so buffered hits are not lost. */
+export async function flushSoon() {
+  await maybeFlush();
+  if (!Object.keys(buf).length) return;
+  const wait = Math.max(0, 20_000 - (Date.now() - lastFlush)) + 500;
+  await new Promise((r) => setTimeout(r, wait));
+  if (Object.keys(buf).length) await maybeFlush(true);
+}
 async function listAll() {
   const out: { pathname: string; url: string }[] = [];
   let cursor: string | undefined;

@@ -1,7 +1,8 @@
 import { NextResponse, after } from "next/server";
-import { record, maybeFlush, dayKey, BOT_RE } from "../../../lib/analytics";
+import { record, flushSoon, dayKey, BOT_RE } from "../../../lib/analytics";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 const dec = (s: string | null) => { if (!s) return ""; try { return decodeURIComponent(s); } catch { return s; } };
 
 export async function POST(req: Request) {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
   const seen = /(?:^|;\s*)gv_day=([0-9-]+)/.exec(cookie)?.[1];
   const newVisitor = seen !== today;
   record({ path, country, region, city, newVisitor });
-  after(() => maybeFlush());
+  after(() => flushSoon());
   if (newVisitor) res.cookies.set("gv_day", today, { httpOnly: true, sameSite: "lax", secure: true, path: "/", maxAge: 60 * 60 * 26 });
   return res;
 }
