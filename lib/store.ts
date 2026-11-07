@@ -4,6 +4,21 @@ import type { Content } from "./types";
 
 const PREFIX = "content/settings";
 
+// Previous built-in logo files. A saved setting that still points at one of
+// these falls back to the new mark; anything else is a custom upload and stays.
+const LEGACY_LOGO_PATHS = new Set(["/logo.svg", "/logo.png", "/logo-light.svg", "/logo-light.png", "/mark.svg"]);
+const LEGACY_FAVICON_PATHS = new Set([
+  "/favicon.ico", "/favicon-32.png", "/apple-touch-icon.png", "/apple-icon.png", "/icon.png", "/icon-512.png", "/mark.svg",
+]);
+
+function publicPath(v: unknown): string {
+  if (typeof v !== "string" || !v) return "";
+  if (v.startsWith("http://") || v.startsWith("https://")) {
+    try { return new URL(v).pathname; } catch { return ""; }
+  }
+  return v;
+}
+
 function merge<T>(base: T, over: unknown): T {
   if (Array.isArray(base)) return (Array.isArray(over) ? over : base) as T;
   if (base && typeof base === "object") {
@@ -38,6 +53,8 @@ export async function getContent(): Promise<Content> {
       if (id && id.logoSizeMobile === 44) delete id.logoSizeMobile;
     }
     const c = merge(defaults, stored);
+    if (LEGACY_LOGO_PATHS.has(publicPath(c.identity.logo))) c.identity.logo = "";
+    if (LEGACY_FAVICON_PATHS.has(publicPath(c.identity.favicon))) c.identity.favicon = "";
     const blank = { slug: "", title: "", desc: "", image: "", seoTitle: "", seoDesc: "", ogImage: "", points: "", images: [] as string[], highlight: "" };
     c.services = (c.services as Partial<Content["services"][number]>[]).map((s, i) => ({ ...blank, ...s, slug: s.slug || `service-${i + 1}` }));
     return c;

@@ -1,1 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 112"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e27a"/><stop offset=".45" stop-color="#d4af37"/><stop offset="1" stop-color="#8a6d1d"/></linearGradient></defs><path d="M50 3 93 28v56L50 109 7 84V28z" fill="#14161a" stroke="url(#g)" stroke-width="5" stroke-linejoin="round"/><path d="M50 15 82 33.5v45L50 97 18 78.5v-45z" fill="none" stroke="url(#g)" stroke-width="1.4" opacity=".55"/><path d="M20 78 41 46l9 12 12-20 18 40z" fill="url(#g)"/><path d="M41 46l-5 7.5 5-2 4 4.6z M62 38l-5 8.2 5-2.4 4.4 5z" fill="#fff6c9" opacity=".75"/><path d="M50 22l5 6-5 6-5-6z" fill="url(#g)"/><path d="M26 84h48" stroke="url(#g)" stroke-width="2.4" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="title">
+<title id="title">شعار الإصدار الذهبي للتعدين والمقاولات</title>
+<defs>
+<linearGradient id="gold" x1="18%" y1="0%" x2="88%" y2="100%">
+<stop offset="0%" stop-color="#F8E7A8"/>
+<stop offset="32%" stop-color="#F2C75C"/>
+<stop offset="68%" stop-color="#D4A24A"/>
+<stop offset="100%" stop-color="#B8862B"/>
+</linearGradient>
+<clipPath id="disc"><circle cx="100.0" cy="97.0" r="89.8"/></clipPath>
+</defs>
+<path d="M32.23 149.95 A86.00 86.00 0 1 1 167.77 149.95" fill="none" stroke="url(#gold)" stroke-width="7.40" stroke-linecap="butt"/>
+<path d="M36.78 130.61 A71.60 71.60 0 1 1 163.22 130.61" fill="none" stroke="url(#gold)" stroke-width="6.30" stroke-linecap="butt"/>
+<path d="M44.25 112.99 A58.00 58.00 0 1 1 155.75 112.99" fill="none" stroke="url(#gold)" stroke-width="5.50" stroke-linecap="butt"/>
+<g clip-path="url(#disc)">
+<path d="M-22.00 108.00L32.00 128.00L64.00 114.00L104.00 138.00L144.00 116.00L176.00 132.00L222.00 108.00" fill="none" stroke="url(#gold)" stroke-width="7.20" stroke-linejoin="miter" stroke-miterlimit="2.15" stroke-linecap="butt"/>
+<path d="M-22.00 123.00L32.00 143.00L64.00 129.00L104.00 153.00L144.00 131.00L176.00 147.00L222.00 123.00" fill="none" stroke="url(#gold)" stroke-width="6.80" stroke-linejoin="miter" stroke-miterlimit="2.15" stroke-linecap="butt"/>
+<path d="M-22.00 138.00L32.00 158.00L64.00 144.00L104.00 168.00L144.00 146.00L176.00 162.00L222.00 138.00" fill="none" stroke="url(#gold)" stroke-width="6.40" stroke-linejoin="miter" stroke-miterlimit="2.15" stroke-linecap="butt"/>
+<path d="M-22.00 153.00L32.00 173.00L64.00 159.00L104.00 183.00L144.00 161.00L176.00 177.00L222.00 153.00" fill="none" stroke="url(#gold)" stroke-width="6.00" stroke-linejoin="miter" stroke-miterlimit="2.15" stroke-linecap="butt"/>
+</g>
+<path fill="url(#gold)" fill-rule="evenodd" d="M38.00 120.00L50.00 106.00L58.00 114.00L74.00 88.00L86.00 108.00L100.00 62.00L114.00 96.00L124.00 108.00L138.00 92.00L148.00 104.00L160.00 96.00L172.00 120.00L152.00 124.00L124.00 122.00L112.00 130.00L100.00 140.00L88.00 130.00L76.00 122.00L52.00 124.00L38.00 120.00Z M64.00 108.00L72.00 96.00L69.00 100.00L78.00 108.00L70.00 114.00Z M95.00 98.00L100.00 78.00L97.50 90.00L106.00 102.00L100.00 118.00L94.00 104.00Z M142.00 100.00L150.00 92.00L147.00 97.00L156.00 104.00L146.00 106.00Z"/>
+<g><path d="M78.00 48.40L136.00 48.40L136.00 54.40L78.00 54.40Z" fill="url(#gold)"/><path d="M73.80 46.50L80.20 46.50L80.20 56.40L73.80 56.40Z" fill="url(#gold)"/><path d="M133.80 46.50L140.20 46.50L140.20 56.40L133.80 56.40Z" fill="url(#gold)"/><path d="M96.80 54.40L103.20 54.40L101.80 63.00L98.20 63.00Z" fill="url(#gold)"/><path d="M82 49.2 L100 38.4 L130 49.2" fill="none" stroke="url(#gold)" stroke-width="2.4" stroke-linejoin="miter" stroke-linecap="square"/><path d="M100 38.4 V48.4" fill="none" stroke="url(#gold)" stroke-width="2.4" stroke-linecap="square"/><path d="M121.6 54.4 V70.0 M125.4 54.4 V68.0" fill="none" stroke="url(#gold)" stroke-width="2.1" stroke-linecap="square"/><path d="M120.5 70.0 v2.2 a4.4 4.4 0 1 0 7.8 -1.2" fill="none" stroke="url(#gold)" stroke-width="2.1" stroke-linecap="round"/></g>
+</svg>

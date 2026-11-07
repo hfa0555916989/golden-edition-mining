@@ -17,7 +17,15 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: c.seo.title, template: `%s | ${c.hero.badge}` },
     description: c.seo.description,
     keywords: c.seo.keywords.split(/[,،]/).map((s) => s.trim()).filter(Boolean),
-    icons: c.identity.favicon ? { icon: c.identity.favicon } : { icon: [{ url: "/mark.svg", type: "image/svg+xml" }, { url: "/favicon-32.png", sizes: "32x32" }], apple: "/apple-touch-icon.png" },
+    icons: c.identity.favicon ? { icon: c.identity.favicon } : {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.png", type: "image/png", sizes: "512x512" },
+        { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+        { url: "/mark.svg", type: "image/svg+xml" },
+      ],
+      apple: "/apple-icon.png",
+    },
     openGraph: { title: c.seo.title, description: c.seo.description, locale: "ar_SA", type: "website", url: "/", siteName: c.seo.title, images: og ? [og] : undefined },
     twitter: { card: "summary_large_image", title: c.seo.title, description: c.seo.description, images: og ? [og] : undefined },
   };
